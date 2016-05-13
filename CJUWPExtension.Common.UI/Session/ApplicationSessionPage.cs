@@ -42,7 +42,7 @@ namespace CJUWPExtension.Common.UI.Session
             {
                 if (RootFrame != null)
                 {
-                    var pageInSessionHookHardwareBackButton = RootFrame.Content as IPageInSessionHookHardwareBackButton;
+                    var pageInSessionHookHardwareBackButton = RootFrame.Content as IPageInSessionHookBackRequest;
                     if (pageInSessionHookHardwareBackButton != null)
                     {
                         var handled = pageInSessionHookHardwareBackButton.RootPage_BackRequested(e.Handled);
@@ -87,7 +87,7 @@ namespace CJUWPExtension.Common.UI.Session
             {
                 if (RootFrame != null)
                 {
-                    var pageInSessionHookHardwareBackButton = RootFrame.Content as IPageInSessionHookHardwareBackButton;
+                    var pageInSessionHookHardwareBackButton = RootFrame.Content as IPageInSessionHookBackRequest;
                     if (pageInSessionHookHardwareBackButton != null)
                     {
                         var handled = pageInSessionHookHardwareBackButton.RootPage_BackRequested(e.Handled);
