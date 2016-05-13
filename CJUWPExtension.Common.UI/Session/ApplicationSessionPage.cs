@@ -1,4 +1,6 @@
-﻿using Windows.UI.Xaml.Controls;
+﻿using Windows.Phone.UI.Input;
+using Windows.UI.Core;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
@@ -22,11 +24,15 @@ namespace CJUWPExtension.Common.UI.Session
         {
             if (Windows.Foundation.Metadata.ApiInformation.IsTypePresent("Windows.Phone.UI.Input.HardwareButtons"))
             {
-                Windows.Phone.UI.Input.HardwareButtons.BackPressed += Page_HardwareButtonsBackPressed;
+                HardwareButtons.BackPressed += Page_HardwareButtonsBackPressed;
+            }
+            else
+            {
+                SystemNavigationManager.GetForCurrentView().BackRequested += Page_BackRequested;
             }
         }
 
-        protected virtual void Page_HardwareButtonsBackPressed(object sender, Windows.Phone.UI.Input.BackPressedEventArgs e)
+        protected virtual void Page_HardwareButtonsBackPressed(object sender, BackPressedEventArgs e)
         {
             if (e.Handled)
             {
@@ -39,9 +45,55 @@ namespace CJUWPExtension.Common.UI.Session
                     var pageInSessionHookHardwareBackButton = RootFrame.Content as IPageInSessionHookHardwareBackButton;
                     if (pageInSessionHookHardwareBackButton != null)
                     {
-                        pageInSessionHookHardwareBackButton.RootPage_HardwareButtonsBackPressed(sender, e);
-                        if (e.Handled)
+                        var handled = pageInSessionHookHardwareBackButton.RootPage_BackRequested(e.Handled);
+                        if (handled)
                         {
+                            e.Handled = true;
+                            return;
+                        }
+                    }
+                    if (RootFrame.CanGoBack)
+                    {
+                        e.Handled = true;
+                        RootFrame.GoBack();
+                    }
+                    else if (Frame != null)
+                    {
+                        if (Frame.CanGoBack)
+                        {
+                            e.Handled = true;
+                            Frame.GoBack();
+                        }
+                    }
+                }
+                else if (Frame != null)
+                {
+                    if (Frame.CanGoBack)
+                    {
+                        e.Handled = true;
+                        Frame.GoBack();
+                    }
+                }
+            }
+        }
+
+        protected virtual void Page_BackRequested(object sender, BackRequestedEventArgs e)
+        {
+            if (e.Handled)
+            {
+                return;
+            }
+            if (IsActiveSessionPage)
+            {
+                if (RootFrame != null)
+                {
+                    var pageInSessionHookHardwareBackButton = RootFrame.Content as IPageInSessionHookHardwareBackButton;
+                    if (pageInSessionHookHardwareBackButton != null)
+                    {
+                        var handled = pageInSessionHookHardwareBackButton.RootPage_BackRequested(e.Handled);
+                        if (handled)
+                        {
+                            e.Handled = true;
                             return;
                         }
                     }
@@ -83,6 +135,7 @@ namespace CJUWPExtension.Common.UI.Session
             }
             IsSessionPageGoBacked = false;
             BecomeActivePage();
+            SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = Frame.CanGoBack ? AppViewBackButtonVisibility.Visible : AppViewBackButtonVisibility.Collapsed;
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)

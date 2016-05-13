@@ -4,7 +4,7 @@
     public interface IPageInSessionHookHardwareBackButton
     {
 
-        void RootPage_HardwareButtonsBackPressed(object sender, Windows.Phone.UI.Input.BackPressedEventArgs e);
+        bool RootPage_BackRequested(bool handled);
 
     }
 
